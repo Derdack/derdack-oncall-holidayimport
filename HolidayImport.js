@@ -1,27 +1,21 @@
 /*
 This script reads a Google calendar ICS file (e. g. https://calendar.google.com/calendar/ical/en.german%23holiday%40group.v.calendar.google.com/public/basic.ics), and transfers holidays from it into the OnCallPlanHolidays table of Enterprise Alert.
-
 Please set up your STRING_DB_CONNECTION first. Ask your database administrator for support if you do not know it.
-
 Then please set up your STRING_COUNTRY (e. g. "Berlin" or "Brandenburg" etc.) A warning appears if it may not work.
-
 At least mark your team name(s) with the STRING_TEAMS constant. Leave it empty, if you want to save the holidays in all calendars.
-
 Afterwards please execute this script by double-clicking or calling it directly from the command line by typing "WScript CalendarImporter.js".
-
 By default the dry-run marker is activated. If you are happy with your prepared settings (DB, country, team names) please set BOOL_DRY_RUN to false to arm this script. Then re-execute it.
-
 For further support contact us at support@de.derdack.com
 
 v1.0.0 (06.09.2018, Frank Gutacker)
+v1.0.1 (20.11.2019, Frank Gutacker, prevent reading of TeamIDs if they are NULL)
 
 Copyright 2018 Derdack GmbH, www.derdack.com, Enterprise Alert is a registered trademark of Derdack GmbH
 */
 
-
-var STRING_DB_CONNECTION 	= "Driver=SQL Server Native Client 11.0;Server=sqlserver.derdack-support.local;Trusted_Connection=No;UID=sa;PWD=Derdack!;Database=EnterpriseAlert2017"
+var STRING_DB_CONNECTION 	= "Driver=SQL Server Native Client 11.0;Server=sqlserver.derdack-support.local;Trusted_Connection=No;UID=sa;PWD=Derdack!;Database=EnterpriseAlert2017";
 var STRING_COUNTRY			= "Brandenburg"; // Name of country (e. g. "Baden-Württemberg")
-var STRING_TEAMS			= "Support"; // empty string for all, or comma-separated list of team names (e. g. "Administrators,Standard User")
+var STRING_TEAMS			= ""; // empty string for all, or comma-separated list of team names (e. g. "Administrators,Standard User")
 
 var STRING_ICS_FILE 		= ".\\basic.ics";
 
@@ -89,7 +83,7 @@ var DB = {
 		var i = 0;
 		var aIds = [];
 		try {
-			var oRes = oDb.Execute("SELECT TeamID FROM TeamOnCallPlans" + (sTeams != "''" ? " WHERE TeamDisplayName IN (" + sTeams + ")" : ""));
+			var oRes = oDb.Execute("SELECT TeamID FROM TeamOnCallPlans" + (sTeams != "''" ? " WHERE TeamDisplayName IN (" + sTeams + ") AND TeamID IS NOT NULL" : " WHERE TeamID IS NOT NULL"));
 			while (!oRes.EOF) {
 				aIds[i++] = oRes.Fields.Item('TeamID').Value;
 				oRes.MoveNext();
@@ -194,7 +188,7 @@ function hasTeams(STRING_TEAMS) {
 	}
 	var aTeams = STRING_TEAMS.split(",");
 	var sTeams = "'" + aTeams.join("','") + "'";
-	var iRes = DB.count("SELECT * FROM TeamOnCallPlans WHERE TeamDisplayName IN (" + sTeams + ")");
+	var iRes = DB.count("SELECT * FROM TeamOnCallPlans WHERE TeamDisplayName IN (" + sTeams + ") AND TeamID IS NOT NULL");
 	
 	return (iRes == aTeams.length);
 }
