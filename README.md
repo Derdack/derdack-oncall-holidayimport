@@ -8,4 +8,5 @@ STRING_DB_CONNECTION: Database connection string to the Enterprise Alert databas
 STRING_COUNTRY: Filter for the country or region if specifier in the .ics file.
 STRING_TEAMS: The name of the team for which you would like to import the holidays, or empty in order to import the holidays for all teams.
 
-The credits for this script go to my colleague Frank Gutacker.
+You can execute this script on Windows by using the cscript.exe program. Just double-clicking the file will automatically execute it.
+
