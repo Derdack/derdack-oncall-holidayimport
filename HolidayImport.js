@@ -83,9 +83,9 @@ var DB = {
 		var i = 0;
 		var aIds = [];
 		try {
-			var oRes = oDb.Execute("SELECT TeamID FROM TeamOnCallPlans" + (sTeams != "''" ? " WHERE TeamDisplayName IN (" + sTeams + ") AND TeamID IS NOT NULL" : " WHERE TeamID IS NOT NULL"));
+			var oRes = oDb.Execute("SELECT OnCallPlanID FROM TeamOnCallPlans" + (sTeams != "''" ? " WHERE TeamDisplayName IN (" + sTeams + ") AND TeamID IS NOT NULL" : " WHERE TeamID IS NOT NULL"));
 			while (!oRes.EOF) {
-				aIds[i++] = oRes.Fields.Item('TeamID').Value;
+				aIds[i++] = oRes.Fields.Item('OnCallPlanID').Value;
 				oRes.MoveNext();
 			}
 		} catch(e) {
